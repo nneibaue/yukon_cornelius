@@ -15,17 +15,21 @@ class OreProcessorBase:
 
 class Ore:
     '''Class that holds raw html tags containing important attributes.'''
-    def __init__(self):
-        self.id = None
-        self.name = None
-        self.date = None
-        self.body = None
+    def __init__(self, attrs):
+        for attr in attrs:
+            setattr(self, attr, None)
+
+        self._attr_names = attrs
+
+    @property
+    def attributes(self):
+        return {name: getattr(self, name) for name in self._attr_names}
 
 
     @property
     def complete(self):
         '''Returns True if all attributes have a non-None value.'''
-        if all([self.id, self.name, self.date, self.body]):
+        if all(self.attributes.values()):
             return True
         else:
             return False
@@ -33,13 +37,15 @@ class Ore:
     @property
     def bare(self):
         '''Returns true if all attributes are None.'''
-        if not any([self.id, self.name, self.date, self.body]):
+        if not any(self.attributes.values()):
             return True
         else:
             return False
 
     def __repr__(self):
-        return f'Ore(id={self.id}, name={self.name}, date={self.date}, body={self.body})'
+        val_list = ', '.join([f'{name}={self.attributes[name]}'
+                              for name in self.attributes]) 
+        return f'Ore({val_list})'
 
     
 
@@ -61,7 +67,7 @@ class ProspectorBase:
         
 
         self._current_tag = None
-        self._current_ore = Ore()
+        self._current_ore = Ore(['id', 'name', 'date', 'body'])
         self._soup = None
         self._is_finished = False
         self._inside_post = False
@@ -129,7 +135,7 @@ class ProspectorBase:
         '''Adds the current ore (post) to the ore cart and creates a bare ore.'''
         if not self._current_ore.bare:
             self._ore_cart.append(self._current_ore)
-            self._current_ore = Ore()
+            self._current_ore = Ore(['id', 'name', 'date', 'body'])
         print('Ore Dumped')
 
     def _make_soup(self):
@@ -184,7 +190,7 @@ class ProspectorBase:
         '''Modifies url or html to point to the next page. Default is no effect.'''
         pass
 
-    
+        
 class ClassicCarsProspector(ProspectorBase):
     def _is_id_tag(self, tag):
         condition1 = tag.name == 'span'
