@@ -6,12 +6,6 @@ import utils
 
 class SampleProspector(prospector.ProspectorBase):
     '''Prospector used for testing of sample_forum.html.'''
-    def _is_post_start(self, tag):
-        return utils.check_class(tag, 'poststart')
-        #return utils.check_attr(tag.attrs, 'class', 'poststart')
-
-    def _is_post_end(self, tag):
-        return utils.check_class(tag, 'postend')
 
     def _is_id_tag(self, tag):
         return utils.check_class(tag, 'id')
@@ -27,6 +21,9 @@ class SampleProspector(prospector.ProspectorBase):
 
     def _is_forum_end(self, tag):
         return utils.check_class(tag, 'forumend')
+
+    def _turn_page(self):
+        self._is_finished = True
 
 
 class TestProspectorBase(unittest.TestCase):

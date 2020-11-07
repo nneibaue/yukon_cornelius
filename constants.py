@@ -1,6 +1,8 @@
 '''Collection of constants (urls, regex patterns, etc) used for scraping.'''
 URL_ROOT = 'http://www.oldclassiccar.co.uk/forum/phpbb/phpBB2/viewtopic.php?t=12591'
 
+PAGE_END_CLASS = 'page-end'
+
 MONTHS = {
     'jan': 1,
     'january': 1,
@@ -28,7 +30,6 @@ MONTHS = {
 }
 
 
-
 class Patterns:
     POST_LINK = 'viewtopic.php\?p=(?P<post_id>[0-9]*)&.*'
     POST_DATE = (
@@ -36,3 +37,4 @@ class Patterns:
         '(?P<year>[0-9]{4}) (?P<hour>[0-9]{1}):(?P<minute>[0-9]{1,2}) (?P<ampm>am|pm)')
     VALID_HTML = '^<!doctype html>.*'
     VALID_URL = '^(http|https)://www.*'
+    ID_TAG = '^[0-9]{5}$'

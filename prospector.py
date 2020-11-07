@@ -88,10 +88,16 @@ class ProspectorBase:
     def mine(self):
         '''Walks through the forum and extracts post information.'''
         self._num_mines += 1
+        if self._current_tag is not None:
+            print(self._current_tag.name)
+
         # End condition
+        if self._is_finished:
+            return
+
         if self._current_tag is None or self._is_forum_end(self._current_tag):
             self.is_finished = True
-            return
+            self.mine()
 
         # Turn the page
         elif self._is_page_end(self._current_tag):
@@ -122,7 +128,6 @@ class ProspectorBase:
         self._move_to_next_tag()
         self.mine()
 
-
     def _dump_ore(self):
         '''Adds the current ore (post) to the ore cart and creates a bare ore.'''
         if not self._current_ore.bare:
@@ -135,7 +140,15 @@ class ProspectorBase:
         if self._url is not None:
             self._html = requests.get(self._url).text
         self._soup = bs4.BeautifulSoup(self._html, 'html.parser')
+
+        # Make tag to mark the end of this page
+        new_soup = bs4.BeautifulSoup()
+        end_tag = new_soup.new_tag('div', attrs={'class': constants.PAGE_END_CLASS})
+        self._soup.insert(-1, end_tag)
+        
         self._current_tag = self._soup.find('html')
+
+
     def _move_to_next_tag(self):
         '''Moves forward until another Tag or None is found.'''
         self._current_tag = self._current_tag.next
@@ -166,10 +179,8 @@ class ProspectorBase:
         raise NotImplementedError('ProspectorBase class cannot be used for mining')
 
     def _is_page_end(self, tag):
-        '''Returns True if `tag` signals the end of the page. Default is "html"'''
-        if tag.name == 'html':
-            return True
-        return False
+        '''Returns True if `tag` signals the end of the page.'''
+        return utils.check_class(tag, constants.PAGE_END_CLASS)
 
     def _turn_page(self):
         '''Modifies url or html to point to the next page. Default is no effect.'''
@@ -177,8 +188,24 @@ class ProspectorBase:
 
     
 class ClassicCarsProspector(ProspectorBase):
-    pass
+    def _is_id_tag(self, tag):
+        
+        pass
 
+    def _is_name_tag(self, tag):
+        pass
+
+    def _is_date_tag(self, tag):
+        pass
+
+    def is_post_body_tag(self, tag):
+        pass
+
+    def is_page_end(self, tag):
+        pass
+
+    def is_forum_end(self, tag):
+        pass
     
     
     
