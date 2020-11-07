@@ -47,24 +47,16 @@ class Ore:
                               for name in self.attributes]) 
         return f'Ore({val_list})'
 
-    
 
 class ProspectorBase:
 
     # Data type to hold a collection of post tags. Ore will be sent out for
     # processing into (ingots? crystals? data?)
-    def __init__(self, html_or_url):
-        
-        if utils.validate_html(html_or_url):
-            self._html = html_or_url
-            self._url = None
-        
-        elif utils.validate_url(html_or_url):
-            self._url = html_or_url
-
-        else:
-            raise InvalidSourceError('Must pass a valid url or html string!')
-        
+    def __init__(self, site_name):
+        config = utils.load_config()
+        if site_name not in config:
+            raise NameError(f'{site_name} not found! Please check configuration file')
+        self._config = config[site_name]
 
         self._current_tag = None
         self._current_ore = Ore(['id', 'name', 'date', 'body'])
@@ -77,6 +69,7 @@ class ProspectorBase:
         self._make_soup()
         self._move_to_next_tag()
 
+        # List to hold Ore objects
         self._ore_cart = []
         self._num_mines = 0
 
@@ -140,10 +133,8 @@ class ProspectorBase:
 
     def _make_soup(self):
         '''Makes soup from the current url or html content.'''
-        print(f'CURRENT PAGE: {self._current_page}')
-        if self._url is not None:
-            self._html = requests.get(self._url).text
-        self._soup = bs4.BeautifulSoup(self._html, 'html.parser')
+        self._soup = utils.make_soup(self._config['source'],
+                                     self._config['source_type'])
 
         # Make tag to mark the end of this page
         new_soup = bs4.BeautifulSoup()

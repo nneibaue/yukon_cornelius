@@ -1,7 +1,10 @@
 '''Collection of constants (urls, regex patterns, etc) used for scraping.'''
-URL_ROOT = 'http://www.oldclassiccar.co.uk/forum/phpbb/phpBB2/viewtopic.php?t=12591'
+
 
 PAGE_END_CLASS = 'page-end'
+CONFIG = 'website_config.json'
+
+VALID_SOURCE_TYPES = ['html_file', 'https_url']
 
 MONTHS = {
     'jan': 1,

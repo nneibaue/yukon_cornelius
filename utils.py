@@ -1,32 +1,43 @@
 import bs4
 import requests
 import re
+import json
 
 import constants
 
-class InvalidHtmlError(Exception):
-    '''Raised if html is not valid.'''
+class InvalidSourceError(Exception):
+    '''Raised if source is not valid.'''
     pass
 
 
-class InvalidUrlError(Exception):
-    '''Raised if html is not valid.'''
-    pass
+def load_config():
+    with open(constants.CONFIG, 'r') as f:
+        config = json.load(f)
+
+    return config
 
 
-def validate_html(html):
-    '''Returns True if `html` is valid.
+def make_soup(source, source_type):
+    '''Makes soup from a source.'''
     
-    Args:
-      html: str. HTML page'''
+    if source_type not in constants.VALID_SOURCE_TYPES:
+        raise InvalidSourceError(f'{source_type} not a valid source type. Valid types'
+                                 f' are: {constants.VALID_SOURCE_TYPES}')
     
-    if not isinstance(html, str):
-        return False
+    if source_type == 'html_file':
+        if not source.endswith('.html'):
+            raise InvalidSourceError(f'Invalid {source_type}')
+        with open(source, 'r') as f:
+            html = f.read()
+    
+    elif source_type == 'https_url':
+        if not source.startswith('https://www.'):
+            raise InvalidSourceError(f'Invaid {source_type}')    
+        html = requests.get(source).text
 
-    if not re.search(constants.Patterns.VALID_HTML, html):
-        return False
+    return bs4.BeautifulSoup(html)
 
-    return True
+    
 
     
 def validate_url(url):

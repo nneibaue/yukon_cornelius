@@ -1,0 +1,22 @@
+{
+  "classic_cars_forum": {
+    "source": "https://www.oldclassiccar.co.uk/forum/phpbb/phpBB2/viewtopic.php?t=12591",
+    "source_type": "https_url",
+    "attributes": [
+      "id",
+      "name",
+      "date",
+      "body"
+    ]
+  },
+  "sample_forum": {
+    "source": "sample_forum.html",
+    "source_type": "html_file",
+    "attributes": [
+      "id",
+      "name",
+      "date",
+      "body"
+    ]
+  }
+}
