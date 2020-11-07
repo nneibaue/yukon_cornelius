@@ -10,8 +10,6 @@ class InvalidSourceError(Exception):
     pass
 
 
-class OreProcessorBase:
-    pass
 
 class Ore:
     '''Class that holds raw html tags containing important attributes.'''
@@ -47,6 +45,7 @@ class Ore:
                               for name in self.attributes]) 
         return f'Ore({val_list})'
 
+        
 
 class ProspectorBase:
 
@@ -56,13 +55,17 @@ class ProspectorBase:
         config = utils.load_config()
         if site_name not in config:
             raise NameError(f'{site_name} not found! Please check configuration file')
-        self._config = config[site_name]
 
+        self._config = config[site_name]
+        self._root_source = self._config['source']
+        self._attributes = self._config['attributes']
+
+        self._current_source = self._config['source']
         self._current_tag = None
         self._current_ore = Ore(['id', 'name', 'date', 'body'])
         self._soup = None
+
         self._is_finished = False
-        self._inside_post = False
         self._current_page = 0
 
         # make the first soup
@@ -75,13 +78,8 @@ class ProspectorBase:
 
 
     @property
-    def url(self):
-        return self._url
-
-    @property
     def ore_cart(self):
         return self._ore_cart
-    
     
     def mine(self):
         '''Walks through the forum and extracts post information.'''
@@ -102,19 +100,16 @@ class ProspectorBase:
             self.mine()
 
         # Mine a post, dumping the current ore if necessary
-        if self._is_id_tag(self._current_tag):
-            if not self._current_ore.bare:
-                self._dump_ore()
-            self._current_ore.id = self._current_tag
+        for i, attribute in enumerate(self._attributes):
+            tester = getattr(self, f'_is_{attribute}_tag')
+            processor = getattr(self, f'_process_{attribute}')
 
-        if self._is_name_tag(self._current_tag):
-            self._current_ore.name = self._current_tag
-
-        if self._is_date_tag(self._current_tag):
-            self._current_ore.date = self._current_tag
-
-        if self._is_post_body_tag(self._current_tag):
-            self._current_ore.body = self._current_tag
+            if(tester(self._current_tag)):
+                # Dump the current ore if it's not bare
+                if i == i and not self._current_ore.bare:
+                    self._dump_ore
+                setattr(self._current_ore, attribute, processor(self._current_tag))
+            
             
         # Dump the ore if complete
         if self._current_ore.complete:
@@ -132,9 +127,8 @@ class ProspectorBase:
         print('Ore Dumped')
 
     def _make_soup(self):
-        '''Makes soup from the current url or html content.'''
-        self._soup = utils.make_soup(self._config['source'],
-                                     self._config['source_type'])
+        '''Makes new soup.'''
+        self._soup = utils.make_soup(self._current_source, self._config['source_type'])
 
         # Make tag to mark the end of this page
         new_soup = bs4.BeautifulSoup()

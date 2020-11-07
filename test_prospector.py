@@ -9,15 +9,27 @@ class SampleProspector(prospector.ProspectorBase):
 
     def _is_id_tag(self, tag):
         return utils.check_class(tag, 'id')
+    
+    def _process_id(self, tag):
+        return tag
 
     def _is_name_tag(self, tag):
         return utils.check_class(tag, 'name')
 
+    def _process_name(self, tag):
+        return tag
+
     def _is_date_tag(self, tag):
         return utils.check_class(tag, 'date')
 
-    def _is_post_body_tag(self, tag):
+    def _process_date(self, tag):
+        return tag
+
+    def _is_body_tag(self, tag):
         return utils.check_class(tag, 'postbody')
+
+    def _process_body(self, tag):
+        return tag
 
     def _is_forum_end(self, tag):
         return utils.check_class(tag, 'forumend')
@@ -28,41 +40,25 @@ class SampleProspector(prospector.ProspectorBase):
 
 class TestProspectorBase(unittest.TestCase):
 
-    def setUp(self):
-        with open('sample_forum.html', 'r') as f:
-            self.html = f.read()
-            
     
-    def test_instantiation_from_valid_html(self):
-        p = prospector.ProspectorBase(self.html)
+    def test_instantiation_from_valid_website(self):
+        p = prospector.ProspectorBase('sample_forum')
         self.assertIsInstance(p, prospector.ProspectorBase)
 
-    def test_instantiation_from_valid_url(self):
-        p = prospector.ProspectorBase('https://www.google.com')
-        self.assertIsInstance(p, prospector.ProspectorBase)
-
-    def test_instantiation_from_invalid_url_raises_exception(self):
-        with self.assertRaises(prospector.InvalidSourceError):
-            p = prospector.ProspectorBase(5)
-
-    def test_instantiation_from_invalid_html_raises_exception(self):
-        with self.assertRaises(prospector.InvalidSourceError):
-            p = prospector.ProspectorBase(5)
+    def test_instantiation_from_invalid_website(self):
+        with self.assertRaises(NameError):
+            p = prospector.ProspectorBase('google')
 
     def test_cannot_mine_with_base_class(self):
-        p = prospector.ProspectorBase(self.html)
+        p = prospector.ProspectorBase('sample_forum')
         
         with self.assertRaises(NotImplementedError):
             p.mine()
 
 class TestSampleProspector(unittest.TestCase):
 
-    def setUp(self):
-        with open('sample_forum.html', 'r') as f:
-            self.html = f.read()
-
     def test_mine(self):
-        p = SampleProspector(self.html)
+        p = SampleProspector('sample_forum')
         p.mine()
         self.assertEqual(len(p.ore_cart), 4)
         for ore in p.ore_cart:
@@ -71,6 +67,9 @@ class TestSampleProspector(unittest.TestCase):
             self.assertIsInstance(ore.date, Tag)
             self.assertIsInstance(ore.body, Tag)
 
-    
+# with open('sample_forum.html', 'r') as f:
+#     p = SampleProspector(f.read())
+# p.mine()
+
 if __name__ == '__main__':
     unittest.main()
