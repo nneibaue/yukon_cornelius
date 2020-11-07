@@ -38,3 +38,4 @@ class Patterns:
     VALID_HTML = '^<!doctype html>.*'
     VALID_URL = '^(http|https)://www.*'
     ID_TAG = '^[0-9]{5}$'
+    POST_END = 'No posts exist for this topic'

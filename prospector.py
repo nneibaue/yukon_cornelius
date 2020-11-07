@@ -1,7 +1,6 @@
-from collections import namedtuple
 import requests
 import bs4
-from dataclasses import dataclass
+import re
 
 import constants
 import utils
@@ -48,7 +47,6 @@ class ProspectorBase:
 
     # Data type to hold a collection of post tags. Ore will be sent out for
     # processing into (ingots? crystals? data?)
-    Ore = namedtuple('Ore', ('id', 'name', 'date', 'body'))
     def __init__(self, html_or_url):
         
         if utils.validate_html(html_or_url):
@@ -67,6 +65,7 @@ class ProspectorBase:
         self._soup = None
         self._is_finished = False
         self._inside_post = False
+        self._current_page = 0
 
         # make the first soup
         self._make_soup()
@@ -88,8 +87,6 @@ class ProspectorBase:
     def mine(self):
         '''Walks through the forum and extracts post information.'''
         self._num_mines += 1
-        if self._current_tag is not None:
-            print(self._current_tag.name)
 
         # End condition
         if self._is_finished:
@@ -137,6 +134,7 @@ class ProspectorBase:
 
     def _make_soup(self):
         '''Makes soup from the current url or html content.'''
+        print(f'CURRENT PAGE: {self._current_page}')
         if self._url is not None:
             self._html = requests.get(self._url).text
         self._soup = bs4.BeautifulSoup(self._html, 'html.parser')
@@ -189,23 +187,36 @@ class ProspectorBase:
     
 class ClassicCarsProspector(ProspectorBase):
     def _is_id_tag(self, tag):
-        
-        pass
+        condition1 = tag.name == 'span'
+        condition2 = utils.check_class(tag, 'name')
+        return (condition1 and condition2)
 
     def _is_name_tag(self, tag):
-        pass
+        # Same tag as id tag
+        return self._is_id_tag(tag)
 
     def _is_date_tag(self, tag):
-        pass
+        condition1 = re.search(constants.Patterns.POST_DATE, tag.text)
+        condition2 = tag.name == 'span'
+        condition3 = utils.check_class(tag, 'postdetails')
+        return (condition1 and condition2 and condition3)
 
-    def is_post_body_tag(self, tag):
-        pass
+    def _is_post_body_tag(self, tag):
+        condition1 = tag.name == 'span'
+        condition2 = utils.check_class(tag, 'postbody')
+        return (condition1 and condition2)
 
-    def is_page_end(self, tag):
-        pass
-
-    def is_forum_end(self, tag):
-        pass
+    def _is_forum_end(self, tag):
+        condition1 = re.search(constants.Patterns.POST_END, tag.text)
+        condition2 = tag.name == 'span'
+        condition3 = utils.check_class(tag, 'gen')
+        return (condition1 and condition2 and condition3)
+    
+    def _turn_page(self):
+        print(f'TURNING TO PAGE {self._current_page}')
+        self._current_page += 1
+        self._url = f'{self._url}&start={self._current_page * 15}'
+        self._make_soup()
     
     
     
