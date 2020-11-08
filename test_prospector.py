@@ -1,7 +1,10 @@
 import unittest
 from bs4.element import Tag
-import prospector
 import utils
+import re
+
+import constants
+import prospector
 
 
 class SampleProspector(prospector.ProspectorBase):
@@ -38,8 +41,12 @@ class SampleProspector(prospector.ProspectorBase):
         self._is_finished = True
 
 
-class TestProspectorBase(unittest.TestCase):
+class SampleProspectorProcessDate(SampleProspector):
+    def _process_date(self, tag):
+        return tag.text
 
+
+class TestProspectorBase(unittest.TestCase):
     
     def test_instantiation_from_valid_website(self):
         p = prospector.ProspectorBase('sample_forum')
@@ -55,6 +62,7 @@ class TestProspectorBase(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             p.mine()
 
+
 class TestSampleProspector(unittest.TestCase):
 
     def test_mine(self):
@@ -67,9 +75,8 @@ class TestSampleProspector(unittest.TestCase):
             self.assertIsInstance(ore.date, Tag)
             self.assertIsInstance(ore.body, Tag)
 
-# with open('sample_forum.html', 'r') as f:
-#     p = SampleProspector(f.read())
-# p.mine()
+p = SampleProspector('sample_forum')
+p.mine()
 
 if __name__ == '__main__':
     unittest.main()

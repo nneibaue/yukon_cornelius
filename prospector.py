@@ -83,41 +83,38 @@ class ProspectorBase:
     
     def mine(self):
         '''Walks through the forum and extracts post information.'''
-        self._num_mines += 1
+        while True:
+            #self._num_mines += 1
+            # End condition
+            if self._is_finished:
+                return
 
-        # End condition
-        if self._is_finished:
-            return
+            if self._current_tag is None or self._is_forum_end(self._current_tag):
+                self.is_finished = True
 
-        if self._current_tag is None or self._is_forum_end(self._current_tag):
-            self.is_finished = True
-            self.mine()
+            # Turn the page
+            elif self._is_page_end(self._current_tag):
+                self._turn_page()
+                self._make_soup()
 
-        # Turn the page
-        elif self._is_page_end(self._current_tag):
-            self._turn_page()
-            self._make_soup()
-            self.mine()
+            # Mine tags that match, dumping the current ore if necessary
+            for i, attribute in enumerate(self._attributes):
+                tester = getattr(self, f'_is_{attribute}_tag')
+                processor = getattr(self, f'_process_{attribute}')
 
-        # Mine a post, dumping the current ore if necessary
-        for i, attribute in enumerate(self._attributes):
-            tester = getattr(self, f'_is_{attribute}_tag')
-            processor = getattr(self, f'_process_{attribute}')
-
-            if(tester(self._current_tag)):
-                # Dump the current ore if it's not bare
-                if i == i and not self._current_ore.bare:
-                    self._dump_ore
-                setattr(self._current_ore, attribute, processor(self._current_tag))
-            
-            
-        # Dump the ore if complete
-        if self._current_ore.complete:
-            self._dump_ore()
-                    
-        # Move on
-        self._move_to_next_tag()
-        self.mine()
+                if(tester(self._current_tag)):
+                    # Dump the current ore if it's not bare
+                    if i == i and not self._current_ore.bare:
+                        self._dump_ore
+                    setattr(self._current_ore, attribute, processor(self._current_tag))
+                
+                
+            # Dump the ore if complete
+            if self._current_ore.complete:
+                self._dump_ore()
+                        
+            # Move on
+            self._move_to_next_tag()
 
     def _dump_ore(self):
         '''Adds the current ore (post) to the ore cart and creates a bare ore.'''
@@ -146,26 +143,8 @@ class ProspectorBase:
             if self._current_tag is None:
                 break
                 
-                
-    def _is_id_tag(self, tag):
-        '''Returns True if `tag` contains the post id.'''
-        raise NotImplementedError('ProspectorBase class cannot be used for mining')
-    
-    def _is_name_tag(self, tag):
-        '''Returns True if `tag` contains the post author's name.'''
-        raise NotImplementedError('ProspectorBase class cannot be used for mining')
-
-    def _is_date_tag(self, tag):
-        '''Returns True if `tag` contains the post date.'''
-        raise NotImplementedError('ProspectorBase class cannot be used for mining')
-
-    def is_post_body_tag(self, tag):
-        '''Returns True if `tag` contains the post body.'''
-        raise NotImplementedError('ProspectorBase class cannot be used for mining')
-
     def _is_forum_end(self, tag):
-        '''Returns True if `tag` is the end of the forum.'''
-        raise NotImplementedError('ProspectorBase class cannot be used for mining')
+        raise NotImplementedError
 
     def _is_page_end(self, tag):
         '''Returns True if `tag` signals the end of the page.'''
