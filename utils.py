@@ -14,6 +14,12 @@ class InvalidConfigError(Exception):
     pass
 
 def load_website_config(site_name):
+    '''Loads the configuration for a specific website.
+    
+    Args:
+      site_name: str. A website defined in the config file `constants.CONFIG_FILE.`
+      
+    '''
     with open(constants.CONFIG_FILE, 'r') as f:
         config = json.load(f)
 
@@ -68,3 +74,6 @@ def check_class(tag, classname):
         return False
     
     return classname in tag.attrs['class']
+
+def refine_ore_cart():
+    pass
