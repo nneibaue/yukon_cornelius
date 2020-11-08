@@ -113,10 +113,9 @@ class ProspectorBase:
                 tester = getattr(self, tester)
 
                 if(tester(self._current_tag)):
-                    # Dump ore before assigning new attributes
                     if i == 0 and not self._current_ore.bare:
                         self._dump_ore
-                    
+
                     # Uses a processor if exists
                     if hasattr(self, processor):
                         processor = getattr(self, processor)
@@ -125,21 +124,11 @@ class ProspectorBase:
                         this_attribute = str(self._current_tag)
                         
                     setattr(self._current_ore, attribute, this_attribute)
-                    # if attribute == 'body':
-                    #     print(self._current_ore.name, self._current_ore.complete,
-                    #           self._current_ore.attributes.values(),
-                    #           {'id': self._current_ore.id is not None,
-                    #            'name': self._current_ore.name is not None,
-                    #            'date': self._current_ore.date is not None,
-                    #            'body': self._current_ore.body is not None})
-                
-                
-            # Dump the ore if complete
-                if self._current_ore.complete:
-                    self._dump_ore()
-                        
+
             # Move on
             self._move_to_next_tag()
+            if self._current_ore.complete:
+                self._dump_ore
 
     def _dump_ore(self):
         '''Adds the current ore (post) to the ore cart and creates a bare ore.'''
