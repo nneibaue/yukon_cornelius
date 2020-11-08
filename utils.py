@@ -22,7 +22,7 @@ def load_website_config(site_name):
 
     # Make sure each website has required keys
     missing_keys = []
-    keys = config[site_name]
+    keys = config[site_name].keys()
     for req_key in constants.REQUIRED_CONFIG_KEYS:
         if req_key not in keys:
             missing_keys.append(req_key)
@@ -30,7 +30,7 @@ def load_website_config(site_name):
         raise InvalidConfigError(f'Website {site_name} is missing the following'
                                     f'keys: {missing_keys}') 
 
-    return config
+    return config[site_name]
 
 
 def make_soup(source, source_type):

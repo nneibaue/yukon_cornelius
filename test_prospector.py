@@ -39,10 +39,6 @@ class TestProspectorBase(unittest.TestCase):
         p = prospector.ProspectorBase('sample_forum')
         self.assertIsInstance(p, prospector.ProspectorBase)
 
-    def test_instantiation_from_invalid_website(self):
-        with self.assertRaises(NameError):
-            p = prospector.ProspectorBase('google')
-
     def test_cannot_mine_with_base_class(self):
         p = prospector.ProspectorBase('sample_forum')
         

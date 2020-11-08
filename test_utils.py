@@ -1,10 +1,6 @@
 import unittest
 from bs4 import BeautifulSoup
 import utils
-
-TEST_CONFIG = 'test_config.json'
-
-#class TestLoadConfig(unittest.TestCase):
     
 
 class TestLoadConfig(unittest.TestCase):
@@ -15,6 +11,10 @@ class TestLoadConfig(unittest.TestCase):
     def test_load_site_with_missing_keys_raises_exception(self):
         with self.assertRaisesRegex(utils.InvalidConfigError, 'missing the following'):
             config = utils.load_website_config('test_website_with_missing_keys')
+
+    def test_attempt_to_load_missing_site_raises_exception(self):
+        with self.assertRaisesRegex(utils.InvalidConfigError, 'google not found'):
+            config = utils.load_website_config('google')
 
 
 class TestMakeSoup(unittest.TestCase):

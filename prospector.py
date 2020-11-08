@@ -191,12 +191,12 @@ class ClassicCarsProspector(ProspectorBase):
     def _process_date(self, date_tag):
         '''Converts to datetime object and saves as iso format.'''
         try:
-            s = re.search(constants.Patterns.POST_DATE, date_tag.text)
+            s = re.search(constants.ClassicCars.POST_DATE_PATTERN, date_tag.text)
             year = int(s['year'])
         except TypeError:
             breakpoint()
 
-        month = constants.MONTHS[s['month'].lower()]
+        month = constants.ClassicCars.MONTHS[s['month'].lower()]
         hour = int(s['hour']) - 1
         if s['ampm'] == 'pm':
             hour += 12
@@ -213,7 +213,7 @@ class ClassicCarsProspector(ProspectorBase):
         return body_tag.text
 
     def _is_forum_end(self, tag):
-        condition1 = re.search(constants.Patterns.POST_END, tag.text)
+        condition1 = re.search(constants.ClassicCars.POST_END_PATTERN, tag.text)
         condition2 = tag.name == 'span'
         condition3 = utils.check_class(tag, 'gen')
         return (condition1 and condition2 and condition3)
@@ -223,8 +223,4 @@ class ClassicCarsProspector(ProspectorBase):
         self._current_page += 1
         self._current_source = f'{self._root_source}&start={self._current_page * 15}'
         self._make_soup()
-        #self._is_finished = True
     
-    
-# p = ClassicCarsProspector('classic_cars_forum')
-# p.mine()
