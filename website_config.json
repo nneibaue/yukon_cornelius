@@ -18,5 +18,8 @@
       "date",
       "body"
     ]
+  },
+  "test_website_with_missing_keys": {
+    "source": "none"
   }
 }

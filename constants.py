@@ -2,9 +2,10 @@
 
 
 PAGE_END_CLASS = 'page-end'
-CONFIG = 'website_config.json'
+CONFIG_FILE = 'website_config.json'
 
 VALID_SOURCE_TYPES = ['html_file', 'https_url']
+REQUIRED_CONFIG_KEYS = ['source', 'source_type', 'attributes']
 
 MONTHS = {
     'jan': 1,

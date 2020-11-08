@@ -9,10 +9,26 @@ class InvalidSourceError(Exception):
     '''Raised if source is not valid.'''
     pass
 
+class InvalidConfigError(Exception):
+    '''Rasied if config file is not valid.'''
+    pass
 
-def load_config():
-    with open(constants.CONFIG, 'r') as f:
+def load_website_config(site_name):
+    with open(constants.CONFIG_FILE, 'r') as f:
         config = json.load(f)
+
+    if site_name not in config.keys():
+        raise InvalidConfigError(f'{site_name} not found in config!')
+
+    # Make sure each website has required keys
+    missing_keys = []
+    keys = config[site_name]
+    for req_key in constants.REQUIRED_CONFIG_KEYS:
+        if req_key not in keys:
+            missing_keys.append(req_key)
+    if missing_keys:
+        raise InvalidConfigError(f'Website {site_name} is missing the following'
+                                    f'keys: {missing_keys}') 
 
     return config
 
@@ -38,18 +54,6 @@ def make_soup(source, source_type):
     return bs4.BeautifulSoup(html, features='lxml')
 
 
-    
-def validate_url(url):
-    '''Returns True if url is valid and can send a response.'''
-    if not isinstance(url, str):
-        return False
-    
-    if not re.search(constants.Patterns.VALID_URL, url):
-        return False
-    
-    return url
-    
-    
 def check_class(tag, classname):
     '''Returns True if `tag` has a class `classname`.
     

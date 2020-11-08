@@ -50,12 +50,9 @@ class Ore:
 class ProspectorBase:
 
     def __init__(self, site_name):
-        config = utils.load_config()
-        if site_name not in config:
-            raise NameError(f'{site_name} not found! Please check configuration file')
-
+        config = utils.load_website_config(site_name)
+        self._config = config
         self._site_name = site_name
-        self._config = config[site_name]
         self._root_source = self._config['source']
         self._attributes = self._config['attributes']
 
