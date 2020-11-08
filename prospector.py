@@ -14,11 +14,12 @@ class InvalidSourceError(Exception):
 
 class _Ore:
     '''Data structure for holding "mined" attributes.'''
-    def __init__(self, attrs, default=None):
+    def __init__(self, attrs, site_name, attr_default=None):
         '''Create instance attributes from `attrs` and defaults to `default`.'''
         for attr in attrs:
-            setattr(self, attr, default)
+            setattr(self, attr, attr_default)
         self._attr_names = attrs
+        self.site_name = site_name
 
     @property
     def attributes(self):
@@ -51,7 +52,14 @@ class _ProspectorBase:
 
     def __init__(self, site_name):
         config = utils.load_website_config(site_name)
-        self.constants = getattr(constants, config['prospector_class'])
+
+        # Load class specific constants if defined in `constants.py`
+        if 'prospector_class' in config and \
+            hasattr(constants,config['prospector_class']):
+            self.constants = getattr(constants, config['prospector_class'])
+        else:
+            self.constants = None
+
         self._config = config
         self._site_name = site_name
         self._root_source = self._config['source']
@@ -59,7 +67,7 @@ class _ProspectorBase:
 
         self._current_source = self._config['source']
         self._current_tag = None
-        self._current_ore = _Ore(['id', 'name', 'date', 'body'])
+        self._current_ore = _Ore(self._attributes, self._site_name)
         self._soup = None
 
         self._is_finished = False
@@ -132,7 +140,7 @@ class _ProspectorBase:
         '''Adds the current ore (post) to the ore cart and creates a bare ore.'''
         if not self._current_ore.bare:
             self._ore_cart.append(self._current_ore)
-            self._current_ore = _Ore(self._attributes)
+            self._current_ore = _Ore(self._attributes, self._site_name)
 
     def _make_soup(self):
         '''Makes new soup.'''
@@ -165,6 +173,33 @@ class _ProspectorBase:
         '''Modifies url or html to point to the next page. Default is no effect.'''
         pass
 
+
+class SampleNoProcessors(_ProspectorBase):
+    '''Prospector used for testing of sample_forum.html.'''
+
+    def _is_id_tag(self, tag):
+        return utils.check_class(tag, 'id')
+    
+    def _is_name_tag(self, tag):
+        return utils.check_class(tag, 'name')
+
+    def _is_date_tag(self, tag):
+        return utils.check_class(tag, 'date')
+
+    def _is_body_tag(self, tag):
+        return utils.check_class(tag, 'postbody')
+
+    def _is_forum_end(self, tag):
+        return utils.check_class(tag, 'forumend')
+
+    def _turn_page(self):
+        self._is_finished = True
+
+
+class SampleWithDateProcessor(SampleNoProcessors):
+    def _process_date(self, tag):
+        return tag.text
+        
         
 class ClassicCars(_ProspectorBase):
     def _is_id_tag(self, tag):

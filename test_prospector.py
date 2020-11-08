@@ -7,49 +7,23 @@ import constants
 import prospector
 
 
-class SampleProspectorNoProcessors(prospector.ProspectorBase):
-    '''Prospector used for testing of sample_forum.html.'''
-
-    def _is_id_tag(self, tag):
-        return utils.check_class(tag, 'id')
-    
-    def _is_name_tag(self, tag):
-        return utils.check_class(tag, 'name')
-
-    def _is_date_tag(self, tag):
-        return utils.check_class(tag, 'date')
-
-    def _is_body_tag(self, tag):
-        return utils.check_class(tag, 'postbody')
-
-    def _is_forum_end(self, tag):
-        return utils.check_class(tag, 'forumend')
-
-    def _turn_page(self):
-        self._is_finished = True
-
-class SampleProspectorDateProcessor(SampleProspectorNoProcessors):
-    def _process_date(self, tag):
-        return tag.text
-
-
 class TestProspectorBase(unittest.TestCase):
     
     def test_instantiation_from_valid_website(self):
-        p = prospector.ProspectorBase('sample_forum')
-        self.assertIsInstance(p, prospector.ProspectorBase)
+        p = prospector._ProspectorBase('sample_forum')
+        self.assertIsInstance(p, prospector._ProspectorBase)
 
     def test_cannot_mine_with_base_class(self):
-        p = prospector.ProspectorBase('sample_forum')
+        p = prospector._ProspectorBase('sample_forum')
         
         with self.assertRaises(NotImplementedError):
             p.mine()
 
 
-class TestSampleProspectorNoProcesors(unittest.TestCase):
+class TestSampleNoProcesors(unittest.TestCase):
 
     def test_mine_all_attributes(self):
-        p = SampleProspectorNoProcessors('sample_forum')
+        p = prospector.SampleNoProcessors('sample_forum')
         p.mine()
         self.assertEqual(len(p.ore_cart), 4)
         for ore in p.ore_cart:
@@ -59,10 +33,10 @@ class TestSampleProspectorNoProcesors(unittest.TestCase):
             self.assertIsInstance(ore.body, str)
 
 
-class TestSampleProspectorDateProcessor(unittest.TestCase):
+class TestSampleWithDateProcessor(unittest.TestCase):
 
     def test_date_is_processed(self):
-        p = SampleProspectorDateProcessor('sample_forum')
+        p = prospector.SampleWithDateProcessor('sample_forum')
         p.mine()
         dates = [ore.date for ore in p.ore_cart]
 
@@ -71,6 +45,8 @@ class TestSampleProspectorDateProcessor(unittest.TestCase):
                                  '10/1/2000',
                                  '10/1/2000'])
     
+p = prospector.SampleWithDateProcessor('sample_forum')
+p.mine()
 
 if __name__ == '__main__':
     unittest.main()
