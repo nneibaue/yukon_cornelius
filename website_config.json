@@ -2,6 +2,7 @@
   "classic_cars_forum": {
     "source": "https://www.oldclassiccar.co.uk/forum/phpbb/phpBB2/viewtopic.php?t=12591",
     "source_type": "https_url",
+    "prospector_class": "ClassicCars",
     "attributes": [
       "id",
       "name",

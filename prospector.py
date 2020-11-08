@@ -12,7 +12,7 @@ class InvalidSourceError(Exception):
 
 
 
-class Ore:
+class _Ore:
     '''Data structure for holding "mined" attributes.'''
     def __init__(self, attrs, default=None):
         '''Create instance attributes from `attrs` and defaults to `default`.'''
@@ -47,10 +47,11 @@ class Ore:
         return f'Ore({val_list})'
 
         
-class ProspectorBase:
+class _ProspectorBase:
 
     def __init__(self, site_name):
         config = utils.load_website_config(site_name)
+        self.constants = getattr(constants, config['prospector_class'])
         self._config = config
         self._site_name = site_name
         self._root_source = self._config['source']
@@ -58,7 +59,7 @@ class ProspectorBase:
 
         self._current_source = self._config['source']
         self._current_tag = None
-        self._current_ore = Ore(['id', 'name', 'date', 'body'])
+        self._current_ore = _Ore(['id', 'name', 'date', 'body'])
         self._soup = None
 
         self._is_finished = False
@@ -131,7 +132,7 @@ class ProspectorBase:
         '''Adds the current ore (post) to the ore cart and creates a bare ore.'''
         if not self._current_ore.bare:
             self._ore_cart.append(self._current_ore)
-            self._current_ore = Ore(self._attributes)
+            self._current_ore = _Ore(self._attributes)
 
     def _make_soup(self):
         '''Makes new soup.'''
@@ -165,7 +166,7 @@ class ProspectorBase:
         pass
 
         
-class ClassicCarsProspector(ProspectorBase):
+class ClassicCars(_ProspectorBase):
     def _is_id_tag(self, tag):
         condition1 = tag.name == 'span'
         condition2 = utils.check_class(tag, 'name')
@@ -191,12 +192,12 @@ class ClassicCarsProspector(ProspectorBase):
     def _process_date(self, date_tag):
         '''Converts to datetime object and saves as iso format.'''
         try:
-            s = re.search(constants.ClassicCars.POST_DATE_PATTERN, date_tag.text)
+            s = re.search(self.constants.POST_DATE_PATTERN, date_tag.text)
             year = int(s['year'])
         except TypeError:
             breakpoint()
 
-        month = constants.ClassicCars.MONTHS[s['month'].lower()]
+        month = self.constants.MONTHS[s['month'].lower()]
         hour = int(s['hour']) - 1
         if s['ampm'] == 'pm':
             hour += 12
@@ -213,7 +214,7 @@ class ClassicCarsProspector(ProspectorBase):
         return body_tag.text
 
     def _is_forum_end(self, tag):
-        condition1 = re.search(constants.ClassicCars.POST_END_PATTERN, tag.text)
+        condition1 = re.search(self.constants.POST_END_PATTERN, tag.text)
         condition2 = tag.name == 'span'
         condition3 = utils.check_class(tag, 'gen')
         return (condition1 and condition2 and condition3)
