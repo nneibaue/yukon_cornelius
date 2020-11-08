@@ -7,6 +7,8 @@ VALID_SOURCE_TYPES = ['html_file', 'https_url']
 REQUIRED_CONFIG_KEYS = ['source', 'source_type', 'attributes']
 VALID_HTML = '^<!doctype html>.*'
 VALID_URL = '^(http|https)://www.*'
+VALID_ORE_EXPORT_TYPES = ['csv', 'json', 'html']
+EXPORT_DIR = 'exports'
 
 
 # Website specific. Class name must match "prospector_class" attribute in config

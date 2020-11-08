@@ -2,6 +2,8 @@ import bs4
 import requests
 import re
 import json
+import pandas as pd
+import os
 
 import constants
 
@@ -75,5 +77,35 @@ def check_class(tag, classname):
     
     return classname in tag.attrs['class']
 
-def refine_ore_cart():
-    pass
+def refine_ore(ore_list, export_filetype='csv'):
+    '''Returns DataFrame of content in `ore_list`, optionally exporting.
+    
+    Args:
+      ore_list. list of Ore objects. All Ores in this list must have the same value
+        for `Ore.site_name`. It is very unlikely that any other scenario would occur.
+      export_filetype: str. Filetype for export. Valid filetypes are defined in
+        `constants.VALID_ORE_EXPORT_TYPES`
+       '''
+    
+    if not isinstance(ore_list, list):
+        raise ValueError(f'Expected list, got {type(ore_list)}')
+
+    site_name = ore_list[0].site_name
+
+    ore_dicts = []
+    for i, ore in enumerate(ore_list):
+        if ore.site_name != site_name:
+            raise ValueError(f'All Ore should come from {site_name}. Found Ore from '
+                             f'{ore.site_name}')
+        ore_dicts.append(ore.attributes)
+
+    df = pd.DataFrame(ore_dicts)
+
+    # Make export directory if it doesn't exist
+    if not os.path.isdir(constants.EXPORT_DIR):
+        os.makedirs(constants.EXPORT_DIR)
+
+    exporter = getattr(df, f'to_{export_filetype}')
+    filepath = os.path.join(constants.EXPORT_DIR, f'{site_name}.{export_filetype}')
+    exporter(filepath)
+    return df

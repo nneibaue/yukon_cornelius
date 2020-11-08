@@ -1,6 +1,12 @@
 import unittest
-from bs4 import BeautifulSoup
 import utils
+from parameterized import parameterized
+from bs4 import BeautifulSoup
+from pandas import DataFrame
+import os
+
+import prospector
+import constants
     
 
 class TestLoadConfig(unittest.TestCase):
@@ -57,6 +63,27 @@ class TestCheckClass(unittest.TestCase):
     def test_no_classes_returns_false(self):
         self.assertFalse(utils.check_class(self.tag_noclasses, 'classname'))
         
+
+class TestRefineOre(unittest.TestCase):
+    
+    def setUp(self):
+       self.p = prospector.SampleNoProcessors('sample_forum')
+       self.p.mine()
+
+    # Test all export types dynamically. This ensures that when a new export type is
+    # added, the test should not have to be updated
+    @parameterized.expand(constants.VALID_ORE_EXPORT_TYPES)
+    def test_refine_valid_ore_(self, export_type):
+        df = utils.refine_ore(self.p.ore_cart, export_type)
+        self.assertIsInstance(df, DataFrame)
+        path = os.path.join(constants.EXPORT_DIR, f'sample_forum.{export_type}')
+        self.assertTrue(os.path.exists(path))
+
+    def tearDown(self):
+        for f in os.listdir(constants.EXPORT_DIR):
+            if f.startswith('sample_forum'):
+                fullpath = os.path.join(constants.EXPORT_DIR, f)
+                os.remove(fullpath)
 
 if __name__ == '__main__':
     unittest.main()
