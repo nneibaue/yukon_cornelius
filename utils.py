@@ -35,9 +35,8 @@ def make_soup(source, source_type):
             raise InvalidSourceError(f'Invaid {source_type}')    
         html = requests.get(source).text
 
-    return bs4.BeautifulSoup(html)
+    return bs4.BeautifulSoup(html, features='lxml')
 
-    
 
     
 def validate_url(url):

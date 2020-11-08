@@ -1,6 +1,7 @@
 import requests
 import bs4
 import re
+from datetime import datetime
 
 import constants
 import utils
@@ -12,17 +13,17 @@ class InvalidSourceError(Exception):
 
 
 class Ore:
-    '''Class that holds raw html tags containing important attributes.'''
-    def __init__(self, attrs):
+    '''Data structure for holding "mined" attributes.'''
+    def __init__(self, attrs, default=None):
+        '''Create instance attributes from `attrs` and defaults to `default`.'''
         for attr in attrs:
-            setattr(self, attr, None)
-
+            setattr(self, attr, default)
         self._attr_names = attrs
 
     @property
     def attributes(self):
+        '''Returns a dictionary of the current attributes and values.'''
         return {name: getattr(self, name) for name in self._attr_names}
-
 
     @property
     def complete(self):
@@ -46,16 +47,14 @@ class Ore:
         return f'Ore({val_list})'
 
         
-
 class ProspectorBase:
 
-    # Data type to hold a collection of post tags. Ore will be sent out for
-    # processing into (ingots? crystals? data?)
     def __init__(self, site_name):
         config = utils.load_config()
         if site_name not in config:
             raise NameError(f'{site_name} not found! Please check configuration file')
 
+        self._site_name = site_name
         self._config = config[site_name]
         self._root_source = self._config['source']
         self._attributes = self._config['attributes']
@@ -90,28 +89,54 @@ class ProspectorBase:
                 return
 
             if self._current_tag is None or self._is_forum_end(self._current_tag):
-                self.is_finished = True
+                self._is_finished = True
+                return
 
             # Turn the page
             elif self._is_page_end(self._current_tag):
                 self._turn_page()
                 self._make_soup()
 
-            # Mine tags that match, dumping the current ore if necessary
             for i, attribute in enumerate(self._attributes):
-                tester = getattr(self, f'_is_{attribute}_tag')
-                processor = getattr(self, f'_process_{attribute}')
+
+                # Function that accepts a tag and returns a boolean
+                tester = f'_is_{attribute}_tag'
+
+                # Function that accedpts a tag and returns a string
+                processor = f'_process_{attribute}'
+
+                # Ensure proper methods are defined for tag testing
+                if not hasattr(self, tester):
+                    raise NotImplementedError(
+                        f'Must implement `{tester}` for "{self._site_name}" website')
+
+                tester = getattr(self, tester)
 
                 if(tester(self._current_tag)):
-                    # Dump the current ore if it's not bare
-                    if i == i and not self._current_ore.bare:
+                    # Dump ore before assigning new attributes
+                    if i == 0 and not self._current_ore.bare:
                         self._dump_ore
-                    setattr(self._current_ore, attribute, processor(self._current_tag))
+                    
+                    # Uses a processor if exists
+                    if hasattr(self, processor):
+                        processor = getattr(self, processor)
+                        this_attribute = processor(self._current_tag)
+                    else:
+                        this_attribute = str(self._current_tag)
+                        
+                    setattr(self._current_ore, attribute, this_attribute)
+                    # if attribute == 'body':
+                    #     print(self._current_ore.name, self._current_ore.complete,
+                    #           self._current_ore.attributes.values(),
+                    #           {'id': self._current_ore.id is not None,
+                    #            'name': self._current_ore.name is not None,
+                    #            'date': self._current_ore.date is not None,
+                    #            'body': self._current_ore.body is not None})
                 
                 
             # Dump the ore if complete
-            if self._current_ore.complete:
-                self._dump_ore()
+                if self._current_ore.complete:
+                    self._dump_ore()
                         
             # Move on
             self._move_to_next_tag()
@@ -120,8 +145,7 @@ class ProspectorBase:
         '''Adds the current ore (post) to the ore cart and creates a bare ore.'''
         if not self._current_ore.bare:
             self._ore_cart.append(self._current_ore)
-            self._current_ore = Ore(['id', 'name', 'date', 'body'])
-        print('Ore Dumped')
+            self._current_ore = Ore(self._attributes)
 
     def _make_soup(self):
         '''Makes new soup.'''
@@ -161,20 +185,46 @@ class ClassicCarsProspector(ProspectorBase):
         condition2 = utils.check_class(tag, 'name')
         return (condition1 and condition2)
 
+    def _process_id(self, id_tag):
+        return id_tag.find('a').attrs['name']
+
     def _is_name_tag(self, tag):
         # Same tag as id tag
         return self._is_id_tag(tag)
 
+    def _process_name(self, name_tag):
+        #return str(name_tag)
+        return name_tag.find('b').text
+
     def _is_date_tag(self, tag):
-        condition1 = re.search(constants.Patterns.POST_DATE, tag.text)
+        condition1 = tag.text.startswith('Posted')
         condition2 = tag.name == 'span'
         condition3 = utils.check_class(tag, 'postdetails')
         return (condition1 and condition2 and condition3)
 
-    def _is_post_body_tag(self, tag):
+    def _process_date(self, date_tag):
+        '''Converts to datetime object and saves as iso format.'''
+        try:
+            s = re.search(constants.Patterns.POST_DATE, date_tag.text)
+            year = int(s['year'])
+        except TypeError:
+            breakpoint()
+
+        month = constants.MONTHS[s['month'].lower()]
+        hour = int(s['hour']) - 1
+        if s['ampm'] == 'pm':
+            hour += 12
+        date = datetime(int(s['year']), month, int(s['day']), hour, int(s['minute']))
+        return date.isoformat()
+
+    def _is_body_tag(self, tag):
         condition1 = tag.name == 'span'
         condition2 = utils.check_class(tag, 'postbody')
-        return (condition1 and condition2)
+        condition3 = tag.text != ''
+        return (condition1 and condition2 and condition3)
+
+    def _process_body(self, body_tag):
+        return body_tag.text
 
     def _is_forum_end(self, tag):
         condition1 = re.search(constants.Patterns.POST_END, tag.text)
@@ -185,39 +235,10 @@ class ClassicCarsProspector(ProspectorBase):
     def _turn_page(self):
         print(f'TURNING TO PAGE {self._current_page}')
         self._current_page += 1
-        self._url = f'{self._url}&start={self._current_page * 15}'
+        self._current_source = f'{self._root_source}&start={self._current_page * 15}'
         self._make_soup()
+        #self._is_finished = True
     
     
-    
-
-    # def _mine_single_post(self):
-    #     '''Adds one piece of Ore to the cart.'''
-    #     print('INSIDE POST')
-    #     self.insidePost = True
-    #     id_ = None
-    #     name = None
-    #     date = None
-    #     body = None
-
-    #     while not self._is_post_end(self._current_tag):
-
-    #         # Note: no 'elif' since one tag could contain multiple attributes
-    #         if self._is_id_tag(self._current_tag):
-    #             print('ID TAG FOUND')
-    #             id_ = self._current_tag
-    #         if self._is_name_tag(self._current_tag):
-    #             print('NAME TAG FOUND')
-    #             name = self._current_tag
-    #         if self._is_date_tag(self._current_tag):
-    #             print('DATE TAG FOUND')
-    #             date = self._current_tag
-    #         if self._is_post_body_tag(self._current_tag):
-    #             print('BODY TAG FOUND')
-    #             body = self._current_tag
-
-    #         # Move one tag forward
-    #         self._move_to_next_tag()
-        
-    #     self._ore_cart.append(ProspectorBase.Ore(id_, name, date, body))
-    #     self.insidePost = False
+# p = ClassicCarsProspector('classic_cars_forum')
+# p.mine()

@@ -37,7 +37,7 @@ class Patterns:
     POST_LINK = 'viewtopic.php\?p=(?P<post_id>[0-9]*)&.*'
     POST_DATE = (
         'Posted: [a-zA-Z]{3} (?P<month>[a-zA-Z]{3}) (?P<day>[0-9]{1,2}), '
-        '(?P<year>[0-9]{4}) (?P<hour>[0-9]{1}):(?P<minute>[0-9]{1,2}) (?P<ampm>am|pm)')
+        '(?P<year>[0-9]{4}) (?P<hour>[0-9]{1,2}):(?P<minute>[0-9]{1,2}) (?P<ampm>am|pm)')
     VALID_HTML = '^<!doctype html>.*'
     VALID_URL = '^(http|https)://www.*'
     ID_TAG = '^[0-9]+$'
