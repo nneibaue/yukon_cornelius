@@ -60,27 +60,62 @@ class _ProspectorBase:
         else:
             self.constants = None
 
-        self._config = config
-        self._site_name = site_name
-        self._root_source = self._config['source']
-        self._attributes = self._config['attributes']
+        # Class-specific attributes
+        self.config = config
+        self.site_name = site_name
+        self.root_source = self.config['source']
+        self.attributes = self.config['attributes']
 
-        self._current_source = self._config['source']
+        # State variables
+        self._current_source = self.config['source']
         self._current_tag = None
-        self._current_ore = _Ore(self._attributes, self._site_name)
+        self._current_ore = _Ore(self.attributes, self.site_name)
         self._soup = None
-
         self._is_finished = False
         self._current_page = 0
 
         # make the first soup
-        self._make_soup()
+        self.make_soup()
         self._move_to_next_tag()
 
         # List to hold Ore objects
         self._ore_cart = []
         self._num_mines = 0
 
+    @property
+    def state(self):
+        '''Returns the current value of all dynamic state variables.'''
+        return {
+            'current_source': self._current_source,
+            'current_tag': self._current_tag,
+            'current_ore': self._current_ore,
+            'current_page': self._current_page,
+            'soup': self._soup,
+            'is_finished': self._is_finished,
+            'num_mines': self._num_mines,
+            'num_ore': len(self.ore_cart),
+        }
+    
+    def set_state(self, var_name, value):
+        '''Sets the state of `var_name` to `value`.
+        
+        The only state variables that can be set are:
+          - 'current_source',
+          - 'current_tag',
+          - 'current_page'
+        '''
+        state_types = {'current_source': type('foobar'),
+                       'current_tag': type(bs4.element.Tag(name='a')),
+                       'current_page': type(5)}
+
+        if var_name not in state_types:
+            raise ValueError(f'Cannot set the state of {var_name}')
+        
+        if type(value) != state_types[var_name]:
+            raise TypeError(f'{var_name} expected type {state_types[var_name]}. Got '
+                            f'type {type(value)}')
+
+        setattr(self, f'_{var_name}', value)
 
     @property
     def ore_cart(self):
@@ -101,9 +136,9 @@ class _ProspectorBase:
             # Turn the page
             elif self._is_page_end(self._current_tag):
                 self._turn_page()
-                self._make_soup()
+                self.make_soup()
 
-            for i, attribute in enumerate(self._attributes):
+            for i, attribute in enumerate(self.attributes):
 
                 # Function that accepts a tag and returns a boolean
                 tester = f'_is_{attribute}_tag'
@@ -114,7 +149,7 @@ class _ProspectorBase:
                 # Ensure proper methods are defined for tag testing
                 if not hasattr(self, tester):
                     raise NotImplementedError(
-                        f'Must implement `{tester}` for "{self._site_name}" website')
+                        f'Must implement `{tester}` for "{self.site_name}" website')
 
                 tester = getattr(self, tester)
 
@@ -140,11 +175,11 @@ class _ProspectorBase:
         '''Adds the current ore (post) to the ore cart and creates a bare ore.'''
         if not self._current_ore.bare:
             self._ore_cart.append(self._current_ore)
-            self._current_ore = _Ore(self._attributes, self._site_name)
+            self._current_ore = _Ore(self.attributes, self.site_name)
 
-    def _make_soup(self):
-        '''Makes new soup.'''
-        self._soup = utils.make_soup(self._current_source, self._config['source_type'])
+    def make_soup(self):
+        '''Makes new soup from the current source.'''
+        self._soup = utils.make_soup(self._current_source, self.config['source_type'])
 
         # Make tag to mark the end of this page
         new_soup = bs4.BeautifulSoup()
@@ -256,7 +291,9 @@ class ClassicCars(_ProspectorBase):
     
     def _turn_page(self):
         print(f'TURNING TO PAGE {self._current_page}')
-        self._current_page += 1
-        self._current_source = f'{self._root_source}&start={self._current_page * 15}'
-        self._make_soup()
+        current_page = self.state['current_page']
+        self.set_state('current_page', current_page + 1)
+        self.set_state('current_source',
+                       f'{self.root_source}&start={current_page * 15}')
+        self.make_soup()
     
