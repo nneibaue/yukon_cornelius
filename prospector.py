@@ -126,9 +126,9 @@ class ProspectorBase:
                     setattr(self._current_ore, attribute, this_attribute)
 
             # Move on
-            self._move_to_next_tag()
             if self._current_ore.complete:
-                self._dump_ore
+                self._dump_ore()
+            self._move_to_next_tag()
 
     def _dump_ore(self):
         '''Adds the current ore (post) to the ore cart and creates a bare ore.'''
