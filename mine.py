@@ -3,6 +3,7 @@ import prospectors
 import utils
 import sys
 import constants
+import yaml
 
 from multiprocessing import Process
 
@@ -13,20 +14,23 @@ def mine_website(site_name, export_filetype='csv'):
     prospector.mine()
     utils.refine_ore(prospector.ore_cart, export_filetype=export_filetype)
 
+def run_from_yaml_config(config_file):
+    with open(config_file, 'r') as f:
+        run_config = yaml.load(f, Loader=yaml.Loader)
+
+    print(run_config)
+    for website in run_config['websites']:
+        p = Process(target=mine_website,
+                    args=(website, run_config['websites'][website]['filetype']))
+        p.start()
 
 
 if __name__ == '__main__':
     if not sys.argv[1]:
-        print('Must pass a website name! See "website_config.json" for valid site names')
+        print('Must pass a website name or yaml config!')
     else:
-        for filetype in constants.VALID_ORE_EXPORT_TYPES:
-            print(filetype)
-            p = Process(target=mine_website, args=(sys.argv[1], filetype))
-            p.start()
-        # site_name_1 = sys.argv[1]
-        # site_name_2 = sys.argv[2]
-        # p1 = Process(target=mine_website, args=(site_name_1, ))
-        # p2 = Process(target = mine_website, args=(site_name_2, ))
-        # p1.start()
-        # p2.start()
-        # print('helllo')
+        arg = sys.argv[1]
+        if arg.endswith('yml'):
+            run_from_yaml_config(arg)
+        else:
+            mine_website(arg, export_filetype='csv')
