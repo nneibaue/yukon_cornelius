@@ -19,7 +19,6 @@ def run_from_yaml_config(config_file):
     with open(config_file, 'r') as f:
         run_config = yaml.load(f, Loader=yaml.Loader)
 
-    print(run_config)
     for website in run_config['websites']:
         p = Process(target=mine_website,
                     args=(website, run_config['websites'][website]['filetype']))
