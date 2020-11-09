@@ -1,6 +1,3 @@
 websites:
     classic_cars_forum:
         filetype: csv
-
-    sample_forum:
-        filetype: json

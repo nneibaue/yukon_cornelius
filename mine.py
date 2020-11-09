@@ -6,13 +6,12 @@ import yaml
 from multiprocessing import Process
 
 from yukon_cornelius import constants
-from yukon_cornelius import prospectors
+from yukon_cornelius.prospectors import sites
 from yukon_cornelius import utils
-
 
 def mine_website(site_name, export_filetype='csv'):
     config = utils.load_website_config(site_name)
-    prospector = getattr(prospectors, config['prospector_class'])(site_name)
+    prospector = getattr(sites, config['prospector_class'])(site_name)
     prospector.mine()
     utils.refine_ore(prospector.ore_cart, export_filetype=export_filetype)
 

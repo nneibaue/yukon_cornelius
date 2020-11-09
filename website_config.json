@@ -22,6 +22,7 @@
   "sample_forum": {
     "source": "/Users/nate/flashpoint/yukon_cornelius/tests/sample_forum.html",
     "source_type": "html_file",
+    "prospector_class": "SampleNoProcessors",
     "attributes": [
       "id",
       "name",

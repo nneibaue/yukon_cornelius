@@ -1,8 +1,10 @@
 '''Sites-specific Prospectors.'''
 
 import re
+from datetime import datetime
 
-from . import utils
+from .. import utils
+from ..prospectors.base import ProspectorBase
 
 class ClassicCars(ProspectorBase):
     def _is_id_tag(self, tag):

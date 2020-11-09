@@ -46,8 +46,33 @@ class _Ore:
         return f'Ore({val_list})'
 
         
-class ProspectorBase:
+class ProspectorBase: 
+    '''Base class for all prospectors.
+    
+    This class can't be instantiated on its own -- it must be subclassed. Each subclass
+    must implement methods of the following form:
+    
+        def is_<attribute>_tag(self, tag: bs4.element.Tag) -> bool
+        
+    for each <attribute> defined in the website configuration file for the specific
+    site. The class name for each subclass is also defined in the website configuration
+    file. For example, take the following:
 
+    {
+        "mysite": {
+            source: "mysite.html",
+            "source_type": "html_file",
+            "prospector_class": "MySite",
+            "attributes": [
+                "id",
+                "poster_age"
+            ]
+    }
+
+    A valid class implementation for this specification would look like:
+    
+    class MySite()
+    '''
     def __init__(self, site_name):
         config = utils.load_website_config(site_name)
 
