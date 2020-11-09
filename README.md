@@ -1,7 +1,7 @@
 # Yukon Cornelius Web Scraper
 
 
-This library provides a small, easy-to-use web scraping framework in Python. The workflow is modeled after mining, and is aptly named after [Yukon Cornelius](https://rankinbass.fandom.com/wiki/Yukon_Cornelius) - The Greatest Prospector in the North - and provides building blocks for scraping items of interest from websites and web pages. Included in this library are two pre-configured sample websites (a classic cars forum and a local html page also used for testing purposes) that provide examples for how to implement the framework. 
+This library provides a small, easy-to-use web scraping framework in Python. The workflow is modeled after mining, and is aptly named after [Yukon Cornelius](https://rankinbass.fandom.com/wiki/Yukon_Cornelius) - The Greatest Prospector in the North. Included in this library are two pre-configured sample websites (a classic cars forum and a local html page also used for testing purposes) that provide examples for how to implement the framework. 
 
 ## Author's Note
 
