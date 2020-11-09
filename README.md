@@ -68,7 +68,7 @@ All prospectors have access to a dynamic `state` attribute that keeps track of t
 New prospectors can be easily implemented via the following steps:
   
   #### Step 1
-Define a new website in *website_config.json* using the required keys listed in `yukon_cornelius.consants.REQUIRED_CONFIG_KEYS`. Let's take the classic cars example:
+Define a new website in *website_config.json* using the required keys listed in `yukon_cornelius.constants.REQUIRED_CONFIG_KEYS`. Let's take the classic cars example:
 
 ```json
   "classic_cars_forum": {
@@ -129,13 +129,12 @@ In addition to attribute testing and processing, prospectors must implement the 
 ## Design Analysis
 
 ### Strengths
-- Full customization. Because tags are searched individually and processed separately, the user could theoretically mine *any* text from *any* website
-- Robust error handling. There is a rigorous structure in place forcing the user to "stay within the lines" when subclassing and building configuration files.
-- Parts included. All of the plumbing remains intact when implementing a new website.
+- **Full customization**. Because tags are searched individually and processed separately, the user could theoretically mine *any* text from *any* website
+- **Robust error handling**. There is a rigorous structure in place forcing the user to "stay within the lines" when subclassing and building configuration files.
+- **Parts included**. All of the plumbing remains intact when implementing a new website.
 
 ### Weaknesses
-- Complex. In order to satisfy the requirement of *easy to implement a new website*, the `ProspectorBase` and `Ore` classes rely heavily on "magic" methods, such as `getattr`, `hasattr`, and `setattr`, sacrificing some readability in favor of flexibility. 
-
+- **Complex**. In order to satisfy the requirement of *easy to implement a new website*, the `ProspectorBase` and `Ore` classes rely heavily on "magic" methods, such as `getattr`, `hasattr`, and `setattr`, sacrificing some readability in favor of flexibility.
 
 
 ## Configuring a run
