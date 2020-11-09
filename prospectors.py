@@ -120,9 +120,14 @@ class _ProspectorBase:
     @property
     def ore_cart(self):
         return self._ore_cart
+
+    def log(self, s):
+        '''Prints a string prepended with the site name.'''
+        print(f'{self.site_name}: {s}')
     
     def mine(self):
         '''Walks through the forum and extracts post information.'''
+        self.log('Mining started')
         while True:
             #self._num_mines += 1
             # End condition
@@ -290,8 +295,8 @@ class ClassicCars(_ProspectorBase):
         return (condition1 and condition2 and condition3)
     
     def _turn_page(self):
-        print(f'TURNING TO PAGE {self._current_page}')
         current_page = self.state['current_page']
+        self.log(f'Starting page {current_page + 1}')
         self.set_state('current_page', current_page + 1)
         self.set_state('current_source',
                        f'{self.root_source}&start={current_page * 15}')
