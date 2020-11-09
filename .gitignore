@@ -1,5 +1,9 @@
 # Found this example here: https://github.com/github/gitignore/blob/master/Python.gitignore
 
+
+# data exports
+exports/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

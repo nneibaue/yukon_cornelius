@@ -10,6 +10,15 @@
       "body"
     ]
   },
+  "classic_cars_forum2": {
+    "source": "https://www.oldclassiccar.co.uk/forum/phpbb/phpBB2/viewtopic.php?t=12591",
+    "source_type": "https_url",
+    "prospector_class": "ClassicCars",
+    "attributes": [
+      "id",
+      "name"
+    ]
+  },
   "sample_forum": {
     "source": "sample_forum.html",
     "source_type": "html_file",
