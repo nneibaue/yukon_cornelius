@@ -26,11 +26,16 @@ The software can be run out of the box with the following two steps
 2. Run `mine.py`
 
 ### Activating the environment
-The zip file included a local environment `env` with required installed packages. Activate it by executing the following command:
+The zip file includes a local environment `env` that can be activated with the following command.
 
     source env/bin/activate
   
-Your terminal prompt should now be prepended with `(env)`, e.g. `(env) computer:~ user$ `
+Your terminal prompt should now be prepended with `(env)`, e.g. `(env) computer:~ user$ `. If this doesn't work, then you can simply create a new virtual environment and install the required packages from `requirements.txt`:
+
+    python3 -m venv env
+    source env/bin/activate
+    pip install --upgrade pip
+    pip install -r requirements.txt
 
 <br>
 
