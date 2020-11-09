@@ -1,11 +1,13 @@
-'''Mines websites for attributes of interest.'''
-import prospectors
-import utils
+'''Factories to create Prospectors and mine websites.'''
+
 import sys
-import constants
 import yaml
 
 from multiprocessing import Process
+
+from yukon_cornelius import constants
+from yukon_cornelius import prospectors
+from yukon_cornelius import utils
 
 
 def mine_website(site_name, export_filetype='csv'):

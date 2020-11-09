@@ -34,7 +34,8 @@ class TestMakeSoup(unittest.TestCase):
             soup = utils.make_soup('thiswebsite.com', 'https_url')
 
     def test_make_soup_from_valid_html_file(self):
-        soup = utils.make_soup('sample_forum.html', 'html_file')
+        soup = utils.make_soup('/Users/nate/flashpoint/yukon_cornelius/'
+                               'tests/sample_forum.html', 'html_file')
         self.assertIsInstance(soup, BeautifulSoup)
 
     def test_make_soup_from_invalid_html_file(self):

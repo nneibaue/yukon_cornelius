@@ -20,7 +20,7 @@
     ]
   },
   "sample_forum": {
-    "source": "sample_forum.html",
+    "source": "/Users/nate/flashpoint/yukon_cornelius/tests/sample_forum.html",
     "source_type": "html_file",
     "attributes": [
       "id",
