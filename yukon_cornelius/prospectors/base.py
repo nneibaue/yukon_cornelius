@@ -52,11 +52,15 @@ class ProspectorBase:
     This class can't be instantiated on its own -- it must be subclassed. Each subclass
     must implement methods of the following form:
     
-        def is_<attribute>_tag(self, tag: bs4.element.Tag) -> bool
+        def _is_<attribute>_tag(self, tag: bs4.element.Tag) -> bool
         
     for each <attribute> defined in the website configuration file for the specific
     site. The class name for each subclass is also defined in the website configuration
-    file. For example, take the following:
+    file. Subsequently, processing functions can be defined of the following form:
+    
+        def _process_<attribute>(self, tag: bs4.element.Tag) -> str
+        
+    For example, take the following:
 
     {
         "mysite": {
@@ -71,7 +75,14 @@ class ProspectorBase:
 
     A valid class implementation for this specification would look like:
     
-    class MySite()
+    class MySite(ProspectorBase):
+        def _is_id_tag(self, tag):
+            # Do some checks
+            return <True | False
+
+        def _is_poster_age_tag(self, tag):
+            # Do some checks
+            return <True | False
     '''
     def __init__(self, site_name):
         config = utils.load_website_config(site_name)

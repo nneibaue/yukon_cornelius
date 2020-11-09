@@ -3,6 +3,7 @@
 from .. import utils
 from .base import ProspectorBase
 
+
 class SampleNoProcessors(ProspectorBase):
     '''Prospector used for testing of sample_forum.html.'''
 
