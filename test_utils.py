@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from pandas import DataFrame
 import os
 
-import prospector
+import prospectors
 import constants
     
 
@@ -67,7 +67,7 @@ class TestCheckClass(unittest.TestCase):
 class TestRefineOre(unittest.TestCase):
     
     def setUp(self):
-       self.p = prospector.SampleNoProcessors('sample_forum')
+       self.p = prospectors.SampleNoProcessors('sample_forum')
        self.p.mine()
 
     # Test all export types dynamically. This ensures that when a new export type is
