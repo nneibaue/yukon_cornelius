@@ -5,7 +5,7 @@ import json
 import pandas as pd
 import os
 
-import constants
+from yukon_cornelius import constants
 
 class InvalidSourceError(Exception):
     '''Raised if source is not valid.'''

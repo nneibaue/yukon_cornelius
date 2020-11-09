@@ -1,12 +1,12 @@
 import unittest
-import utils
 from parameterized import parameterized
 from bs4 import BeautifulSoup
 from pandas import DataFrame
 import os
 
-import prospectors
-import constants
+from ..prospectors import samples
+from .. import constants
+from .. import utils
     
 
 class TestLoadConfig(unittest.TestCase):
@@ -67,7 +67,7 @@ class TestCheckClass(unittest.TestCase):
 class TestRefineOre(unittest.TestCase):
     
     def setUp(self):
-       self.p = prospectors.SampleNoProcessors('sample_forum')
+       self.p = samples.SampleNoProcessors('sample_forum')
        self.p.mine()
 
     # Test all export types dynamically. This ensures that when a new export type is
