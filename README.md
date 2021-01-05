@@ -10,7 +10,7 @@ The following questions were presented:
  2. Is your code a one-off script or could it be used as the basis of a more general scraping engine? 
  3. Is your code written in good, idiomatic Python? 
  
-This submission is an attempt to create a general scraping engine, as noted in question #2. After completing about 75% of the *one-off script* approach, I decided I would take on the challenge of creating something a bit more robust and generalizable. It was indeed a challenging problem, especially given my lack of experience getting into the weeds with html documents, but I am satisfied with this project. 
+This submission is an attempt to create a general scraping engine, as noted in question #2. After completing about 75% of the *one-off script* approach, I decided I would take on the challenge of creating something a bit more robust and generalizable.
 
 The specific challenge I attempted to take here was an answer to the following:
 
