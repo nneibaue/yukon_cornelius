@@ -96,7 +96,7 @@ Define a new website in *website_config.json* using the required keys listed in 
 Implement the class defined by the `prospector_class` field. This class must implement *tester* methods for each of the attributes defined by the `attributes` field above that take on the form `_is_<attribute>_tag`. These methods must accept a beautiful soup tag and return a boolean. Any attribute that is listed in the config but not implemented will raise an exception. For the classic cars example above, a `ClassicCars` implementation would look like the following:
 
 ```python
-class ClassicCars:
+class ClassicCars(ProspectorBase):
   def _is_id_tag(self, tag):
     # Check things
     return <True | False>
