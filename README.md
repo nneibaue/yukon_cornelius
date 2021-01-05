@@ -1,24 +1,7 @@
 # Yukon Cornelius Web Scraper
 
 
-This library provides a small, easy-to-use web scraping framework in Python. The workflow is modeled after mining, and is aptly named after [Yukon Cornelius](https://rankinbass.fandom.com/wiki/Yukon_Cornelius) - The Greatest Prospector in the North. Included in this library are two pre-configured sample websites (a classic cars forum and a local html page also used for testing purposes) that provide examples for how to implement the framework. 
-
-## Author's Note
-
-The following questions were presented:
- 1. Have you thought about the modularity, maintainability, testability, and shareability of your code? 
- 2. Is your code a one-off script or could it be used as the basis of a more general scraping engine? 
- 3. Is your code written in good, idiomatic Python? 
- 
-This submission is an attempt to create a general scraping engine, as noted in question #2. After completing about 75% of the *one-off script* approach, I decided I would take on the challenge of creating something a bit more robust and generalizable.
-
-The specific challenge I attempted to take here was an answer to the following:
-
-> Given that website designs are incredibly varied and unique, How do I create a scraping framework that allows full website-specific customization with *minimal implementation code* for new websites. 
-
-My solution, as I hope to persuade you, solves this problem quite cleanly, while addressing scalability (via parallelization) in addition to the aforementioned modularity, maintainability, testability, and shareability. I am confident that I could implement a variety of different sites using this framework with minimal headache.
-
-
+This library provides a small, easy-to-use web scraping framework in Python, allowing full website-specific customization with *minimal implementation code*. The workflow is modeled after mining, and is aptly named after [Yukon Cornelius](https://rankinbass.fandom.com/wiki/Yukon_Cornelius) - The Greatest Prospector in the North. Included in this library are two pre-configured sample websites (a classic cars forum and a local html page also used for testing purposes) that provide examples for how to implement the framework. 
 
 ## Quickstart
 The software can be run out of the box with the following two steps
